@@ -6,7 +6,12 @@ on:
       release:
         type: string
         required: true
-        description: 'Kubectl release version'
+        description: 'Internal release version counter'
+        default: '0'
+      kubectl:
+        type: string
+        required: true
+        description: 'Kubectl version'
         default: '1.32.5'
 
 jobs:
@@ -35,7 +40,7 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository }}
           tags: |
-            type=raw,value=v${{ github.event.inputs.release }}-tumbleweed
+            type=raw,value=${{ github.event.inputs.kubectl }}-r${{ github.event.inputs.release }}-tumbleweed
 
       - name: Build and push Docker image
         id: push
@@ -44,7 +49,7 @@ jobs:
           context: .
           provenance: false
           build-args: |
-            KUBECTL_VERSION=${{ github.event.inputs.release }}
+            KUBECTL_VERSION=${{ github.event.inputs.kubectl }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
